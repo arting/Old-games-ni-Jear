@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Soul Knight Games</title>     
+    <link rel="stylesheet" href="css/style.css"> 
+
+    <style>
+        body {
+            background-color: #121212;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 10px;
+            touch-action: manipulation;
+            user-select: none;
+        }
+        h1 { margin-bottom: 2px; color: #4caf50; font-size: 22px; text-align: center; }
+        .wave-badge {
+            background: #ff5722;
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        
+        .login-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 8px;
+            max-width: 1200px;
+            width: 100%;
+        }
+        .player-card {
+            background: #222;
+            padding: 8px;
+            border-radius: 6px;
+            border: 2px solid #444;
+            width: 210px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .player-card h3 { margin: 2px 0 6px 0; font-size: 14px; }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 3px;
+            font-size: 10px;
+            background: #333;
+            color: #ccc;
+            border: 1px solid #555;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .tab-btn.active {
+            background: #ff9800;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .player-card input {
+            width: 90%;
+            padding: 4px;
+            margin: 2px 0;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background: #111;
+            color: #fff;
+            font-size: 11px;
+            box-sizing: border-box;
+        }
+        .action-btn {
+            width: 90%;
+            padding: 5px;
+            margin-top: 4px;
+            border: none;
+            border-radius: 4px;
+            background: #2196f3;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .action-btn:hover { opacity: 0.9; }
+        .btn-register { background: #4caf50 !important; }
+        .btn-logout { background: #f44336 !important; }
+
+        .status-msg {
+            font-size: 10px;
+            margin-top: 4px;
+            min-height: 14px;
+            color: #aaa;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: center;
+        }
+
+        canvas {
+            border: 4px solid #333;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            background-color: #1e1e1e;
+            width: 100%;
+            max-width: 1200px;
+            height: auto;
+            touch-action: none;
+        }
+
+        #storyBox {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85%;
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid #ff9800;
+            border-radius: 10px;
+            padding: 12px 16px;
+            box-shadow: 0 0 15px rgba(255, 152, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        #storySpeaker {
+            font-weight: bold;
+            font-size: 15px;
+            color: #ffeb3b;
+            text-transform: uppercase;
+        }
+
+        #storyText {
+            font-size: 13px;
+            color: #ffffff;
+            line-height: 1.4;
+            min-height: 36px;
+        }
+
+        #storyNextBtn {
+            align-self: flex-end;
+            background: #ff9800;
+            color: #000;
+            border: none;
+            padding: 6px 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        #storyNextBtn:hover {
+            background: #ffc107;
+        }
+
+        /* Mobile Controls Styling */
+        .mobile-controls {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .d-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 45px);
+            grid-template-rows: repeat(3, 45px);
+            gap: 3px;
+        }
+
+        .d-btn {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+        .d-btn:active { background: #ff9800; color: #000; }
+
+        .attack-btn {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            background: #ff1744;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            border: 3px solid #fff;
+            box-shadow: 0 0 10px rgba(255, 23, 68, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+        .attack-btn:active { transform: scale(0.92); background: #d50000; }
+
+        .weapon-keys-info {
+            background: #111;
+            border: 1px solid #ff9800;
+            padding: 6px;
+            margin-top: 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #ffeb3b;
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .shop-container {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            max-width: 1200px;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .shop-box {
+            background: #1a1a1a;
+            border: 2px solid #ff9800;
+            border-radius: 6px;
+            padding: 6px 8px;
+            width: 210px;
+            font-size: 11px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .shop-box b { display: block; color: #ffeb3b; margin-bottom: 2px; font-size: 13px; }
+        .shop-btn {
+            background: #333;
+            border: 1px solid #ff9800;
+            color: #fff;
+            padding: 4px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            margin: 3px 0;
+            width: 100%;
+        }
+        .shop-btn:hover { background: #ff9800; color: #000; }
+        .coins-label { font-weight: bold; color: #ffeb3b; }
+        
+        .controls-info {
+            background: #2a2a2a;
+            border-radius: 4px;
+            padding: 5px;
+            margin-top: 4px;
+            font-size: 11px;
+            color: #00e5ff;
+            border: 1px solid #555;
+            text-align: left;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-controls { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Soul Knight Games🎮 (JR o AR )</h1>
+    <div class="wave-badge" id="waveDisplay">WORLD WAVE LEVEL 1</div>
+
+    <div class="login-container">
+        <div class="player-card" style="border-color: #00bcd4;">
+            <h3 style="color: #00bcd4;">Player 1</h3>
+            <div class="tab-buttons" id="p1_tabs">
+                <button class="tab-btn active" onclick="switchMode(0, 'login')">Login</button>
+                <button class="tab-btn" onclick="switchMode(0, 'register')">Register</button>
+            </div>
+            <input type="text" id="p1_user" placeholder="Username">
+            <input type="password" id="p1_pass" placeholder="Password">
+            <button id="p1_btn" class="action-btn" onclick="handleAuthAction(0)">Log In</button>
+            <div class="status-msg" id="p1_status">Not Logged In</div>
+        </div>
+
+        <div class="player-card" style="border-color: #f44336;">
+            <h3 style="color: #f44336;">Player 2</h3>
+            <div class="tab-buttons" id="p2_tabs">
+                <button class="tab-btn active" onclick="switchMode(1, 'login')">Login</button>
+                <button class="tab-btn" onclick="switchMode(1, 'register')">Register</button>
+            </div>
+            <input type="text" id="p2_user" placeholder="Username">
+            <input type="password" id="p2_pass" placeholder="Password">
+            <button id="p2_btn" class="action-btn" onclick="handleAuthAction(1)">Log In</button>
+            <div class="status-msg" id="p2_status">Not Logged In</div>
+        </div>
+
+        <div class="player-card" style="border-color: #4caf50;">
+            <h3 style="color: #4caf50;">Player 3</h3>
+            <div class="tab-buttons" id="p3_tabs">
+                <button class="tab-btn active" onclick="switchMode(2, 'login')">Login</button>
+                <button class="tab-btn" onclick="switchMode(2, 'register')">Register</button>
+            </div>
+            <input type="text" id="p3_user" placeholder="Username">
+            <input type="password" id="p3_pass" placeholder="Password">
+            <button id="p3_btn" class="action-btn" onclick="handleAuthAction(2)">Log In</button>
+            <div class="status-msg" id="p3_status">Not Logged In</div>
+        </div>
+
+        <div class="player-card" style="border-color: #ffeb3b;">
+            <h3 style="color: #ffeb3b;">Player 4</h3>
+            <div class="tab-buttons" id="p4_tabs">
+                <button class="tab-btn active" onclick="switchMode(3, 'login')">Login</button>
+                <button class="tab-btn" onclick="switchMode(3, 'register')">Register</button>
+            </div>
+            <input type="text" id="p4_user" placeholder="Username">
+            <input type="password" id="p4_pass" placeholder="Password">
+            <button id="p4_btn" class="action-btn" onclick="handleAuthAction(3)">Log In</button>
+            <div class="status-msg" id="p4_status">Not Logged In</div>
+        </div>
+
+        <div class="player-card" style="border-color: #9c27b0;">
+            <h3 style="color: #9c27b0;">Player 5</h3>
+            <div class="tab-buttons" id="p5_tabs">
+                <button class="tab-btn active" onclick="switchMode(4, 'login')">Login</button>
+                <button class="tab-btn" onclick="switchMode(4, 'register')">Register</button>
+            </div>
+            <input type="text" id="p5_user" placeholder="Username">
+            <input type="password" id="p5_pass" placeholder="Password">
+            <button id="p5_btn" class="action-btn" onclick="handleAuthAction(4)">Log In</button>
+            <div class="status-msg" id="p5_status">Not Logged In</div>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <canvas id="gameCanvas" width="1200" height="600"></canvas>
+        
+        <div id="storyBox">
+            <div id="storySpeaker">📜 Elder Soul</div>
+            <div id="storyText">Loading story...</div>
+            <button id="storyNextBtn" onclick="nextDialogue()">Sumpay (Next) ➔</button>
+        </div>
+    </div>
+
+    <!-- On-Screen Touch Controls (Mainly for Cellphone) -->
+    <div class="mobile-controls">
+        <div class="d-pad">
+            <div></div>
+            <button class="d-btn" id="mUp">▲</button>
+            <div></div>
+            <button class="d-btn" id="mLeft">◀</button>
+            <div></div>
+            <button class="d-btn" id="mRight">▶</button>
+            <div></div>
+            <button class="d-btn" id="mDown">▼</button>
+            <div></div>
+        </div>
+        <button class="attack-btn" id="mAttack">💥 FIRE</button>
+    </div>
+
+    <div class="weapon-keys-info">
+        ⚔️ <b>PAG-ILIS SA ARMAS (Pinduta ang Numbers / Pili-a):</b><br>
+        <button class="shop-btn" style="width: auto; padding: 2px 8px;" onclick="setPlayerWeapon('1')">[1] 🗡️ Sword</button>
+        <button class="shop-btn" style="width: auto; padding: 2px 8px;" onclick="setPlayerWeapon('2')">[2] 🏹 Bow</button>
+        <button class="shop-btn" style="width: auto; padding: 2px 8px;" onclick="setPlayerWeapon('3')">[3] 🔫 Pistol</button>
+        <button class="shop-btn" style="width: auto; padding: 2px 8px;" onclick="setPlayerWeapon('4')">[4] 🔫 Shotgun</button>
+        <button class="shop-btn" style="width: auto; padding: 2px 8px;" onclick="setPlayerWeapon('5')">[5] 🔫 Machinegun</button>
+    </div>
+
+    <div class="shop-container">
+        <div class="shop-box">
+            <b style="color:#00bcd4;">P1 Controls</b>
+            <div>Lvl <span id="p0_lvl">1</span> | 🪙<span class="coins-label" id="p0_coins">0</span></div>
+            <button class="shop-btn" onclick="buyItem(0, 'potion')">🧪 Buy Potion - 10🪙</button>
+            <div class="controls-info">🕹️ Move: WASD / Touch Buttons<br>💥 Attack: Left Click / Touch Screen</div>
+        </div>
+        
+        <div class="shop-box">
+            <b style="color:#f44336;">P2 Controls</b>
+            <div>Lvl <span id="p1_lvl">1</span> | 🪙<span class="coins-label" id="p1_coins">0</span></div>
+            <button class="shop-btn" onclick="buyItem(1, 'potion')">🧪 Buy Potion - 10🪙</button>
+            <div class="controls-info">🕹️ Move: Arrows | 💥 Spacebar</div>
+        </div>
+
+        <div class="shop-box">
+            <b style="color:#4caf50;">P3 Controls</b>
+            <div>Lvl <span id="p2_lvl">1</span> | 🪙<span class="coins-label" id="p2_coins">0</span></div>
+            <button class="shop-btn" onclick="buyItem(2, 'potion')">🧪 Buy Potion - 10🪙</button>
+            <div class="controls-info">🕹️ Move: I J K L | 💥 Key O</div>
+        </div>
+        
+        <div class="shop-box">
+            <b style="color:#ffeb3b;">P4 Controls</b>
+            <div>Lvl <span id="p3_lvl">1</span> | 🪙<span class="coins-label" id="p3_coins">0</span></div>
+            <button class="shop-btn" onclick="buyItem(3, 'potion')">🧪 Buy Potion - 10🪙</button>
+            <div class="controls-info">🕹️ Move: Num 8,4,5,6 | 💥 Num 0</div>
+        </div>
+       
+        <div class="shop-box">
+            <b style="color:#9c27b0;">P5 Controls</b>
+            <div>Lvl <span id="p4_lvl">1</span> | 🪙<span class="coins-label" id="p4_coins">0</span></div>
+            <button class="shop-btn" onclick="buyItem(4, 'potion')">🧪 Buy Potion - 10🪙</button>
+            <div class="controls-info">🕹️ Move: T F G H | 💥 Key Y</div>
+        </div>
+    </div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let gameWaveLevel = 1;
+let killCountForWave = 0;
+let bossActive = false;
+let isStoryActive = true;
+let currentDialogueIndex = 0;
+
+const introDialogues = [
+    { speaker: "📜 STORY NG GAMES", text: "Once upon a time, there were five friends who went to the forest and saw some plants there. What they didn’t know was that the plants they saw were actually monsters that had lived in the area for a long time. Suddenly, the plants moved and turned into a monster, and they were attacked by the monsters they saw. One of their friends suddenly shouted that they saw a monster, and they got scared when they saw the monsters. One of their friends said, 'Hurry, hide in the trees so the monsters don’t see us,' and another friend said that they saw some stuff in the area they passed by, so they went to get the stuff! 'We need to fight just to survive against these monsters,' said one of their friends.!" },
+    { speaker: "📜 ORY SPOKE", text: "Kailangan ninyong lumaban sa mga halimaw para maka alis sa lugar na inyong pinontahan at wala dapat maiiwan sa inyong lima.wagninyong tularan ako na iniwan lang! HAHAHAHHAHAHAHHAHAHAHHHAHAH" },
+    { speaker: "🥦 BROCCOLI KING (BOSS)", text: "Mwahahaha! Hindi kayo makakalabas dito ng bohay sa aking kalupaan mga tao! Atake, mga alagad ko!" },
+    { speaker: "📜 Jear SPOKE", text: "Kailangan ninyong magtinabangay para matalo ang mga halimaw mga Soul Knights! Gamita ang inyong mga armas aron maka luwason kamo!" }
+];
+
+let activeDialogues = [...introDialogues];
+
+function showStory(dialogues) {
+    activeDialogues = dialogues;
+    currentDialogueIndex = 0;
+    isStoryActive = true;
+    document.getElementById('storyBox').style.display = 'flex';
+    updateDialogueUI();
+}
+
+function updateDialogueUI() {
+    if (currentDialogueIndex < activeDialogues.length) {
+        document.getElementById('storySpeaker').innerText = activeDialogues[currentDialogueIndex].speaker;
+        document.getElementById('storyText').innerText = activeDialogues[currentDialogueIndex].text;
+    } else {
+        document.getElementById('storyBox').style.display = 'none';
+        isStoryActive = false;
+    }
+}
+
+function nextDialogue() {
+    currentDialogueIndex++;
+    updateDialogueUI();
+}
+
+const WEAPONS_MAP = {
+    '1': { type: 'sword', name: '🗡️ Sword' },
+    '2': { type: 'bow', name: '🏹 Bow' },
+    '3': { type: 'pistol', name: '🔫 Pistol' },
+    '4': { type: 'shotgun', name: '🔫 Shotgun' },
+    '5': { type: 'machinegun', name: '🔫 Machinegun' }
+};
+
+function setPlayerWeapon(key) {
+    if (WEAPONS_MAP[key]) {
+        players.forEach(p => {
+            if (p.loggedIn && p.hp > 0) {
+                p.weapon = WEAPONS_MAP[key].type;
+                p.weaponName = WEAPONS_MAP[key].name;
+            }
+        });
+    }
+}
+
+const VEGGIE_TYPES = [
+    { name: 'Broccoli', emoji: '🥦', baseHp: 40, baseSpeed: 1.2, radius: 18, reward: 5, exp: 20 },
+    { name: 'Tomato', emoji: '🍅', baseHp: 30, baseSpeed: 1.8, radius: 15, reward: 3, exp: 15 },
+    { name: 'Eggplant', emoji: '🍆', baseHp: 70, baseSpeed: 0.9, radius: 20, reward: 8, exp: 35 }
+];
+
+const players = [
+    { id: 1, name: 'Player 1', loggedIn: false, authMode: 'login', x: 120, y: 100, color: '#00bcd4', hp: 100, maxHp: 100, level: 1, exp: 0, maxExp: 50, coins: 0, weapon: 'sword', weaponName: '🗡️ Sword', lastShot: 0, aimAngle: 0, isSlashing: false, slashTimer: 0 },
+    { id: 2, name: 'Player 2', loggedIn: false, authMode: 'login', x: 120, y: 200, color: '#f44336', hp: 100, maxHp: 100, level: 1, exp: 0, maxExp: 50, coins: 0, weapon: 'bow', weaponName: '🏹 Bow', lastShot: 0, aimAngle: 0, isSlashing: false, slashTimer: 0 },
+    { id: 3, name: 'Player 3', loggedIn: false, authMode: 'login', x: 120, y: 300, color: '#4caf50', hp: 100, maxHp: 100, level: 1, exp: 0, maxExp: 50, coins: 0, weapon: 'pistol', weaponName: '🔫 Pistol', lastShot: 0, aimAngle: 0, isSlashing: false, slashTimer: 0 },
+    { id: 4, name: 'Player 4', loggedIn: false, authMode: 'login', x: 120, y: 400, color: '#ffeb3b', hp: 100, maxHp: 100, level: 1, exp: 0, maxExp: 50, coins: 0, weapon: 'shotgun', weaponName: '🔫 Shotgun', lastShot: 0, aimAngle: 0, isSlashing: false, slashTimer: 0 },
+    { id: 5, name: 'Player 5', loggedIn: false, authMode: 'login', x: 120, y: 500, color: '#9c27b0', hp: 100, maxHp: 100, level: 1, exp: 0, maxExp: 50, coins: 0, weapon: 'machinegun', weaponName: '🔫 Machinegun', lastShot: 0, aimAngle: 0, isSlashing: false, slashTimer: 0 }
+];
+
+const keys = {};
+const mouse = { x: 0, y: 0, down: false };
+let playerBullets = [];
+let enemyBullets = [];
+let enemies = [];
+
+function switchMode(pIndex, mode) {
+    const p = players[pIndex];
+    if (p.loggedIn) return;
+
+    p.authMode = mode;
+    const pNum = pIndex + 1;
+    const tabs = document.querySelectorAll(`#p${pNum}_tabs .tab-btn`);
+    tabs.forEach(btn => btn.classList.remove('active'));
+    
+    const actionBtn = document.getElementById(`p${pNum}_btn`);
+    if (mode === 'login') {
+        tabs[0].classList.add('active');
+        actionBtn.innerText = 'Log In';
+        actionBtn.className = 'action-btn';
+    } else {
+        tabs[1].classList.add('active');
+        actionBtn.innerText = 'Register';
+        actionBtn.className = 'action-btn btn-register';
+    }
+}
+
+function handleAuthAction(pIndex) {
+    const pNum = pIndex + 1;
+    const p = players[pIndex];
+    const userInput = document.getElementById(`p${pNum}_user`);
+    const passInput = document.getElementById(`p${pNum}_pass`);
+    const actionBtn = document.getElementById(`p${pNum}_btn`);
+    const statusDiv = document.getElementById(`p${pNum}_status`);
+
+    if (p.loggedIn) {
+        p.loggedIn = false;
+        p.name = `Player ${pNum}`;
+        userInput.disabled = false;
+        passInput.disabled = false;
+        passInput.value = '';
+        
+        switchMode(pIndex, 'login');
+        statusDiv.innerHTML = `<span style="color:#aaa;">Not Logged In</span>`;
+        return;
+    }
+
+    const userVal = userInput.value.trim();
+    const passVal = passInput.value.trim();
+
+    if (!userVal || !passVal) {
+        alert("Paki-sulat ang Username ug Password!");
+        return;
+    }
+
+    const savedAccount = localStorage.getItem(`sk_user_${userVal}`);
+
+    if (p.authMode === 'register') {
+        if (savedAccount) {
+            alert("Naa na nag-gamit ani nga Username!");
+            return;
+        }
+        localStorage.setItem(`sk_user_${userVal}`, JSON.stringify({ username: userVal, password: passVal }));
+        alert("Naka-Register na ka! Karon mahimo na ka mo-login.");
+        switchMode(pIndex, 'login');
+        userInput.value = userVal;
+        passInput.value = '';
+    } else {
+        if (!savedAccount) {
+            alert("Wala pa nag-exist kini nga Username! Mag-Register una.");
+            return;
+        }
+        const accData = JSON.parse(savedAccount);
+        if (accData.password === passVal) {
+            p.name = userVal;
+            p.loggedIn = true;
+            p.hp = p.maxHp;
+            
+            userInput.disabled = true;
+            passInput.disabled = true;
+            actionBtn.innerText = 'Log Out';
+            actionBtn.className = 'action-btn btn-logout';
+            statusDiv.innerHTML = `<b style="color:#4caf50;">Ready: ${userVal}</b>`;
+        } else {
+            alert("Mali ang Password!");
+        }
+    }
+}
+
+function buyItem(pIndex, itemType) {
+    const p = players[pIndex];
+    if (!p.loggedIn) { alert("Mag Log-In una!"); return; }
+
+    if (itemType === 'potion') {
+        if (p.coins >= 10) { p.coins -= 10; p.hp = Math.min(p.maxHp, p.hp + 50); alert(`${p.name} used Potion!`); }
+        else alert("Kulang imong Coins!");
+    }
+    updateShopUI(pIndex);
+}
+
+function updateShopUI(pIndex) {
+    const p = players[pIndex];
+    document.getElementById(`p${pIndex}_coins`).innerText = p.coins;
+    document.getElementById(`p${pIndex}_lvl`).innerText = p.level;
+}
+
+function addExp(p, amount) {
+    p.exp += amount;
+    if (p.exp >= p.maxExp) {
+        p.exp -= p.maxExp; p.level++;
+        p.maxExp = Math.floor(p.maxExp * 1.4);
+        p.maxHp += 20; p.hp = p.maxHp;
+    }
+    const pIdx = players.indexOf(p);
+    if (pIdx !== -1) updateShopUI(pIdx);
+}
+
+window.addEventListener('keydown', e => { 
+    keys[e.code] = true; 
+    keys[e.key.toLowerCase()] = true; 
+    if (WEAPONS_MAP[e.key]) setPlayerWeapon(e.key);
+});
+
+window.addEventListener('keyup', e => { keys[e.code] = false; keys[e.key.toLowerCase()] = false; });
+
+function handlePointerPos(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    mouse.x = (clientX - rect.left) * scaleX;
+    mouse.y = (clientY - rect.top) * scaleY;
+}
+
+canvas.addEventListener('mousemove', e => handlePointerPos(e.clientX, e.clientY));
+canvas.addEventListener('mousedown', e => { handlePointerPos(e.clientX, e.clientY); mouse.down = true; });
+canvas.addEventListener('mouseup', () => mouse.down = false);
+
+canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    handlePointerPos(touch.clientX, touch.clientY);
+    mouse.down = true;
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    handlePointerPos(touch.clientX, touch.clientY);
+}, { passive: false });
+
+canvas.addEventListener('touchend', () => mouse.down = false);
+
+function setupMobileBtn(id, keyName) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[keyName] = true; });
+    btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[keyName] = false; });
+    btn.addEventListener('mousedown', () => { keys[keyName] = true; });
+    btn.addEventListener('mouseup', () => { keys[keyName] = false; });
+}
+
+setupMobileBtn('mUp', 'w');
+setupMobileBtn('mDown', 's');
+setupMobileBtn('mLeft', 'a');
+setupMobileBtn('mRight', 'd');
+
+const mAttack = document.getElementById('mAttack');
+if (mAttack) {
+    mAttack.addEventListener('touchstart', (e) => { e.preventDefault(); mouse.down = true; });
+    mAttack.addEventListener('touchend', (e) => { e.preventDefault(); mouse.down = false; });
+    mAttack.addEventListener('mousedown', () => { mouse.down = true; });
+    mAttack.addEventListener('mouseup', () => { mouse.down = false; });
+}
+
+function shoot(p) {
+    if (isStoryActive) return; 
+
+    const now = Date.now();
+    let fireRate = 350;
+    if (p.weapon === 'machinegun') fireRate = 100;
+    if (p.weapon === 'shotgun') fireRate = 450;
+    if (p.weapon === 'sword') fireRate = 300;
+
+    if (now - p.lastShot < fireRate) return;
+    p.lastShot = now;
+
+    const baseDmg = 15 + (p.level * 3);
+
+    if (p.weapon === 'sword') {
+        p.isSlashing = true;
+        p.slashTimer = 10;
+
+        const slashRadius = 50;
+        const slashX = p.x + Math.cos(p.aimAngle) * 28;
+        const slashY = p.y + Math.sin(p.aimAngle) * 28;
+
+        enemies.forEach((enemy, eIdx) => {
+            if (Math.hypot(enemy.x - slashX, enemy.y - slashY) < slashRadius + enemy.radius) {
+                enemy.hp -= (baseDmg + 20);
+                if (enemy.hp <= 0) {
+                    p.coins += enemy.reward;
+                    addExp(p, enemy.exp);
+                    if (enemy.isBoss) {
+                        bossActive = false; gameWaveLevel++; killCountForWave = 0;
+                        document.getElementById('waveDisplay').innerText = `WORLD WAVE LEVEL ${gameWaveLevel}`;
+                        showStory([
+                            { speaker: "📜 ELDER SOUL", text: `Gipilde ninyo ang Boss sa Level ${gameWaveLevel - 1}! Maayo kaayo!` },
+                            { speaker: "👹 NEXT BOSS", text: "Ayaw mo ka-alegre! Mas magkalisod ang sunod nga Wave!" }
+                        ]);
+                    } else {
+                        killCountForWave++;
+                        if (killCountForWave >= 10 && !bossActive) spawnBoss();
+                    }
+                    enemies.splice(eIdx, 1);
+                }
+            }
+        });
+
+        for (let ebIdx = enemyBullets.length - 1; ebIdx >= 0; ebIdx--) {
+            const eb = enemyBullets[ebIdx];
+            if (Math.hypot(eb.x - slashX, eb.y - slashY) < slashRadius + 6) {
+                enemyBullets.splice(ebIdx, 1);
+            }
+        }
+
+    } else if (p.weapon === 'shotgun') {
+        [-0.2, 0, 0.2].forEach(angleOffset => {
+            playerBullets.push({
+                x: p.x, y: p.y,
+                vx: Math.cos(p.aimAngle + angleOffset) * 10,
+                vy: Math.sin(p.aimAngle + angleOffset) * 10,
+                color: '#ff9800', owner: p, damage: baseDmg + 5, radius: 4
+            });
+        });
+    } else if (p.weapon === 'bow') {
+        playerBullets.push({
+            x: p.x, y: p.y,
+            vx: Math.cos(p.aimAngle) * 13,
+            vy: Math.sin(p.aimAngle) * 13,
+            color: '#4caf50', owner: p, damage: baseDmg + 10, radius: 4
+        });
+    } else {
+        playerBullets.push({
+            x: p.x, y: p.y,
+            vx: Math.cos(p.aimAngle) * 11,
+            vy: Math.sin(p.aimAngle) * 11,
+            color: p.weapon === 'machinegun' ? '#ffeb3b' : p.color,
+            owner: p, damage: baseDmg, radius: 4
+        });
+    }
+}
+
+function spawnEnemy() {
+    if (isStoryActive) return;
+    if (enemies.length < 9 && !bossActive) {
+        const vType = VEGGIE_TYPES[Math.floor(Math.random() * VEGGIE_TYPES.length)];
+        enemies.push({
+            name: vType.name,
+            x: 800 + Math.random() * 350, y: 60 + Math.random() * 480,
+            radius: vType.radius, speed: vType.baseSpeed,
+            level: gameWaveLevel,
+            hp: vType.baseHp + (gameWaveLevel * 12), maxHp: vType.baseHp + (gameWaveLevel * 12),
+            emoji: vType.emoji, reward: vType.reward, exp: vType.exp, isBoss: false, lastShoot: Date.now()
+        });
+    }
+}
+setInterval(spawnEnemy, 1400);
+
+function spawnBoss() {
+    bossActive = true;
+    const bossLvl = gameWaveLevel * 2;
+    enemies.push({
+        name: 'BOSS',
+        x: 1000, y: 300, radius: 40, speed: 0.85,
+        level: bossLvl,
+        hp: 500 + (gameWaveLevel * 250), maxHp: 500 + (gameWaveLevel * 250),
+        emoji: gameWaveLevel % 2 === 0 ? '👹' : '😈',
+        reward: 60 * gameWaveLevel, exp: 180 * gameWaveLevel, isBoss: true, lastShoot: Date.now()
+    });
+
+    showStory([
+        { speaker: "⚠️ WARNING!", text: "NAGPAKITA ANG BOSS MONSTER!" },
+        { speaker: "👹 BOSS", text: "Kamo diay ang nanghagit nako? Magmahay mo!" }
+    ]);
+}
+
+function update() {
+    if (isStoryActive) return; 
+
+    const p1 = players[0];
+    if (p1.loggedIn && p1.hp > 0) {
+        if (keys['w']) p1.y = Math.max(16, p1.y - 4); if (keys['s']) p1.y = Math.min(canvas.height - 16, p1.y + 4);
+        if (keys['a']) p1.x = Math.max(16, p1.x - 4); if (keys['d']) p1.x = Math.min(canvas.width - 16, p1.x + 4);
+        p1.aimAngle = Math.atan2(mouse.y - p1.y, mouse.x - p1.x);
+        if (mouse.down) shoot(p1);
+    }
+    const p2 = players[1];
+    if (p2.loggedIn && p2.hp > 0) {
+        if (keys['arrowup']) p2.y = Math.max(16, p2.y - 4); if (keys['arrowdown']) p2.y = Math.min(canvas.height - 16, p2.y + 4);
+        if (keys['arrowleft']) { p2.x = Math.max(16, p2.x - 4); p2.aimAngle = Math.PI; }
+        if (keys['arrowright']) { p2.x = Math.min(canvas.width - 16, p2.x + 4); p2.aimAngle = 0; }
+        if (keys['space']) shoot(p2);
+    }
+    const p3 = players[2];
+    if (p3.loggedIn && p3.hp > 0) {
+        if (keys['i']) p3.y = Math.max(16, p3.y - 4); if (keys['k']) p3.y = Math.min(canvas.height - 16, p3.y + 4);
+        if (keys['j']) { p3.x = Math.max(16, p3.x - 4); p3.aimAngle = Math.PI; }
+        if (keys['l']) { p3.x = Math.min(canvas.width - 16, p3.x + 4); p3.aimAngle = 0; }
+        if (keys['o']) shoot(p3);
+    }
+    const p4 = players[3];
+    if (p4.loggedIn && p4.hp > 0) {
+        if (keys['numpad8']) p4.y = Math.max(16, p4.y - 4); if (keys['numpad5']) p4.y = Math.min(canvas.height - 16, p4.y + 4);
+        if (keys['numpad4']) { p4.x = Math.max(16, p4.x - 4); p4.aimAngle = Math.PI; }
+        if (keys['numpad6']) { p4.x = Math.min(canvas.width - 16, p4.x + 4); p4.aimAngle = 0; }
+        if (keys['numpad0']) shoot(p4);
+    }
+    const p5 = players[4];
+    if (p5.loggedIn && p5.hp > 0) {
+        if (keys['t']) p5.y = Math.max(16, p5.y - 4); if (keys['g']) p5.y = Math.min(canvas.height - 16, p5.y + 4);
+        if (keys['f']) { p5.x = Math.max(16, p5.x - 4); p5.aimAngle = Math.PI; }
+        if (keys['h']) { p5.x = Math.min(canvas.width - 16, p5.x + 4); p5.aimAngle = 0; }
+        if (keys['y']) shoot(p5);
+    }
+
+    for (let bIdx = playerBullets.length - 1; bIdx >= 0; bIdx--) {
+        const b = playerBullets[bIdx];
+        b.x += b.vx; b.y += b.vy;
+
+        if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
+            playerBullets.splice(bIdx, 1); continue;
+        }
+
+        enemies.forEach((enemy, eIdx) => {
+            if (Math.hypot(enemy.x - b.x, enemy.y - b.y) < enemy.radius + b.radius) {
+                enemy.hp -= b.damage;
+                playerBullets.splice(bIdx, 1);
+
+                if (enemy.hp <= 0) {
+                    b.owner.coins += enemy.reward;
+                    addExp(b.owner, enemy.exp);
+
+                    if (enemy.isBoss) {
+                        bossActive = false; gameWaveLevel++; killCountForWave = 0;
+                        document.getElementById('waveDisplay').innerText = `WORLD WAVE LEVEL ${gameWaveLevel}`;
+                        showStory([
+                            { speaker: "📜 ELDER SOUL", text: `Gipilde ninyo ang Boss! Nagmadampigon ang inyong panag-uban!` },
+                            { speaker: "📜 ELDER SOUL", text: `Andam na ba mo sa Wave ${gameWaveLevel}?` }
+                        ]);
+                    } else {
+                        killCountForWave++;
+                        if (killCountForWave >= 10 && !bossActive) spawnBoss();
+                    }
+                    enemies.splice(eIdx, 1);
+                }
+            }
+        });
+    }
+
+    for (let ebIdx = enemyBullets.length - 1; ebIdx >= 0; ebIdx--) {
+        const eb = enemyBullets[ebIdx];
+        eb.x += eb.vx; eb.y += eb.vy;
+
+        if (eb.x < 0 || eb.x > canvas.width || eb.y < 0 || eb.y > canvas.height) {
+            enemyBullets.splice(ebIdx, 1); continue;
+        }
+
+        players.forEach(p => {
+            if (p.loggedIn && p.hp > 0) {
+                if (Math.hypot(p.x - eb.x, p.y - eb.y) < 16 + 5) {
+                    p.hp -= eb.damage;
+                    enemyBullets.splice(ebIdx, 1);
+                }
+            }
+        });
+    }
+
+    const now = Date.now();
+    enemies.forEach((enemy) => {
+        let target = players.find(p => p.loggedIn && p.hp > 0);
+        if (target) {
+            const angle = Math.atan2(target.y - enemy.y, target.x - enemy.x);
+            enemy.x += Math.cos(angle) * enemy.speed;
+            enemy.y += Math.sin(angle) * enemy.speed;
+
+            const shootInterval = enemy.isBoss ? 750 : 2000;
+            if (now - enemy.lastShoot > shootInterval) {
+                enemy.lastShoot = now;
+                if (enemy.isBoss) {
+                    [-0.3, 0, 0.3].forEach(offset => {
+                        enemyBullets.push({
+                            x: enemy.x, y: enemy.y,
+                            vx: Math.cos(angle + offset) * 5.5, vy: Math.sin(angle + offset) * 5.5, damage: 15
+                        });
+                    });
+                } else {
+                    enemyBullets.push({
+                        x: enemy.x, y: enemy.y,
+                        vx: Math.cos(angle) * 4.8, vy: Math.sin(angle) * 4.8, damage: 8
+                    });
+                }
+            }
+        }
+    });
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let anyPlayerLoggedIn = false;
+
+    playerBullets.forEach(b => {
+        ctx.fillStyle = b.color;
+        ctx.beginPath(); ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2); ctx.fill();
+    });
+
+  
+    enemyBullets.forEach(eb => {
+        ctx.fillStyle = '#ff1744';
+        ctx.beginPath(); ctx.arc(eb.x, eb.y, 6, 0, Math.PI * 2); ctx.fill();
+    });
+
+  
+    players.forEach(p => {
+        if (p.loggedIn && p.hp > 0) {
+            anyPlayerLoggedIn = true;
+
+            ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(p.x, p.y, 16, 0, Math.PI * 2); ctx.fill();
+
+            if (p.isSlashing && p.slashTimer > 0) {
+                p.slashTimer--;
+                ctx.strokeStyle = '#00e5ff';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 40, p.aimAngle - 0.8, p.aimAngle + 0.8);
+                ctx.stroke();
+                if (p.slashTimer <= 0) p.isSlashing = false;
+            }
+
+          
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText(`${p.name} (Lvl ${p.level})`, p.x, p.y - 35);
+
+            ctx.fillStyle = '#00e5ff'; ctx.font = '11px sans-serif';
+            ctx.fillText(`${p.weaponName} | 🪙${p.coins}`, p.x, p.y - 20);
+
+          
+            const hpWidth = Math.max(0, (36 * (p.hp / p.maxHp)));
+            ctx.fillStyle = '#f44336'; ctx.fillRect(p.x - 18, p.y - 16, 36, 4);
+            ctx.fillStyle = '#4caf50'; ctx.fillRect(p.x - 18, p.y - 16, hpWidth, 4);
+        }
+    });
+
+    if (!anyPlayerLoggedIn) {
+        ctx.fillStyle = '#888';
+        ctx.font = '18px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText("Please log in with at least one player to start!", canvas.width / 2, canvas.height / 2);
+    }
+
+ 
+    enemies.forEach(enemy => {
+        ctx.font = `${enemy.radius * 1.8}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(enemy.emoji, enemy.x, enemy.y);
+
+        
+        ctx.fillStyle = enemy.isBoss ? '#ff1744' : '#fff';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText(`${enemy.name} Lvl ${enemy.level}`, enemy.x, enemy.y - enemy.radius - 12);
+
+        const eHpWidth = Math.max(0, ((enemy.radius * 2) * (enemy.hp / enemy.maxHp)));
+        ctx.fillStyle = '#f44336'; 
+        ctx.fillRect(enemy.x - enemy.radius, enemy.y - enemy.radius - 6, enemy.radius * 2, 4);
+        ctx.fillStyle = '#4caf50'; 
+        ctx.fillRect(enemy.x - enemy.radius, enemy.y - enemy.radius - 6, eHpWidth, 4);
+    });
+}
+
+function gameLoop() {
+    update();
+    draw();
+    requestAnimationFrame(gameLoop);
+}
+
+
+updateDialogueUI();
+gameLoop();
+</script>
+
+    <footer>
+<div style="background-color:black;text-align:center;color:white;padding-right:150px;
+        font-size:50px;padding:10px;margin-top:10px;margin-bottom: 200px;">       
+<p> ALL Rights Reserved 2026 | Developed by :Jear M. Esguerra</p> 
+</div>
+</footer>
+</body>
+</html>
